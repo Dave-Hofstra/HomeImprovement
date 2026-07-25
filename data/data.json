@@ -1,0 +1,132 @@
+{
+  "projects": [
+    {
+      "id": "roof-cleaning",
+      "title": "Roof Cleaning",
+      "vendors": "",
+      "estimatedCost": 0,
+      "priority": "Med",
+      "workLength": "Short",
+      "order": 1
+    },
+    {
+      "id": "garage-floor",
+      "title": "Garage Floor Replacement",
+      "vendors": "",
+      "estimatedCost": 0,
+      "priority": "Very Low",
+      "workLength": "Med",
+      "order": 12
+    },
+    {
+      "id": "kitchen-remodel",
+      "title": "Kitchen Remodel",
+      "vendors": "",
+      "estimatedCost": 0,
+      "priority": "Med",
+      "workLength": "Long",
+      "order": 3
+    },
+    {
+      "id": "project-1782856025335-z19h",
+      "title": "Driveway Sealing",
+      "vendors": "",
+      "estimatedCost": 0,
+      "priority": "Med",
+      "workLength": "Med",
+      "order": 2
+    },
+    {
+      "id": "project-1782856429648-osoq",
+      "title": "Electrical Surge & Generator Connect",
+      "vendors": "",
+      "estimatedCost": 0,
+      "priority": "High",
+      "workLength": "Short",
+      "order": 0,
+      "done": true,
+      "doneDate": "2026-07-23"
+    },
+    {
+      "id": "project-1782856562814-w1va",
+      "title": "Patio for Grill",
+      "vendors": "",
+      "estimatedCost": 0,
+      "priority": "Very Low",
+      "workLength": "Med",
+      "order": 11
+    },
+    {
+      "id": "project-1782856590580-nlkd",
+      "title": "Flooring Replacement",
+      "vendors": "",
+      "estimatedCost": 0,
+      "priority": "Med",
+      "workLength": "Long",
+      "order": 6
+    },
+    {
+      "id": "project-1782856620297-4ic7",
+      "title": "Bathroom Remodel (Primary)",
+      "vendors": "",
+      "estimatedCost": 0,
+      "priority": "Med",
+      "workLength": "Long",
+      "order": 8
+    },
+    {
+      "id": "project-1782856692352-7rj6",
+      "title": "Land Rover Tires",
+      "vendors": "",
+      "estimatedCost": 0,
+      "priority": "Med",
+      "workLength": "Fast",
+      "order": 4
+    },
+    {
+      "id": "project-1782857438617-ajg7",
+      "title": "Paint Bedroom (Primary)",
+      "vendors": "",
+      "estimatedCost": 0,
+      "priority": "Low",
+      "workLength": "Long",
+      "order": 9
+    },
+    {
+      "id": "project-1782857464175-0y2d",
+      "title": "Paint Living Room",
+      "vendors": "",
+      "estimatedCost": 0,
+      "priority": "Low",
+      "workLength": "Long",
+      "order": 7
+    },
+    {
+      "id": "project-1782950736215-n5ns",
+      "title": "Paint House Outside",
+      "vendors": "",
+      "estimatedCost": 0,
+      "priority": "Very Low",
+      "workLength": "Long",
+      "order": 13
+    },
+    {
+      "id": "project-1783900443457-yzm7",
+      "title": "Place a Palm Tree",
+      "vendors": "",
+      "estimatedCost": 0,
+      "priority": "Low",
+      "workLength": "Med",
+      "order": 10
+    },
+    {
+      "id": "project-1784990770985-b51k",
+      "title": "Air conditioner Soft-Start",
+      "vendors": "Micro Air Easy Start Flex -saw on YouTube.",
+      "estimatedCost": 0,
+      "priority": "Med",
+      "workLength": "Med",
+      "order": 5
+    }
+  ]
+}

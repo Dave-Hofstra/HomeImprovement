@@ -1,0 +1,1401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#3e2723">
+<meta name="apple-mobile-web-app-title" content="Home Improvement">
+<meta name="application-name" content="Home Improvement">
+<title>Home Improvement</title>
+<!-- Favicon -->
+<link rel="icon" href="/HomeImprovement/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="16x16" href="/HomeImprovement/icon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/HomeImprovement/icon-32x32.png">
+<link rel="icon" type="image/png" sizes="48x48" href="/HomeImprovement/icon-48x48.png">
+<!-- Apple Touch Icons (iOS "Add to Home Screen") -->
+<link rel="apple-touch-icon" sizes="120x120" href="/HomeImprovement/icon-120x120.png">
+<link rel="apple-touch-icon" sizes="152x152" href="/HomeImprovement/icon-152x152.png">
+<link rel="apple-touch-icon" sizes="167x167" href="/HomeImprovement/icon-167x167.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/HomeImprovement/icon-180x180.png">
+<!-- Web App Manifest -->
+<link rel="manifest" href="/HomeImprovement/site.webmanifest">
+<!-- iOS splash screen -->
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --brown-dark: #3e2723;
+    --brown-mid: #5d4037;
+    --brown-light: #795548;
+    --orange-accent: #e65100;
+    --orange-light: #ff8f00;
+    --amber: #ffb300;
+    --white: #ffffff;
+    --text: #212121;
+    --text-secondary: #616161;
+    --gray-light: #f5f5f5;
+    --gray-border: #e0e0e0;
+    --shadow: 0 2px 8px rgba(0,0,0,0.12);
+    --radius: 12px;
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+    --priority-high: #d32f2f;
+    --priority-med: #f57c00;
+    --priority-low: #388e3c;
+    --priority-vlow: #757575;
+    --len-long: #5c6bc0;
+    --len-med: #7b1fa2;
+    --len-short: #00897b;
+    --len-fast: #43a047;
+  }
+  html, body {
+    height: 100%;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    color: var(--text);
+    background: #e8e0d5;
+    -webkit-font-smoothing: antialiased;
+    overscroll-behavior: none;
+  }
+
+  /* Header */
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: var(--brown-dark);
+    color: white;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  }
+  .header .home-link {
+    color: white;
+    text-decoration: none;
+    font-size: 22px;
+    line-height: 1;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    padding: 2px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .header h1 {
+    font-size: 18px;
+    font-weight: 600;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .header .header-count {
+    font-size: 13px;
+    font-weight: 400;
+    color: rgba(255,255,255,0.6);
+    background: rgba(255,255,255,0.1);
+    padding: 2px 10px;
+    border-radius: 10px;
+  }
+  .header .header-save-status {
+    font-size: 12px;
+    color: rgba(255,255,255,0.5);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  /* Dashboard */
+  .dashboard {
+    padding: 12px 12px calc(100px + var(--safe-bottom));
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  /* Empty state */
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-secondary);
+  }
+  .empty-state .empty-icon {
+    font-size: 48px;
+    margin-bottom: 12px;
+  }
+  .empty-state p {
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* Card */
+  .project-card {
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin-bottom: 10px;
+    overflow: hidden;
+    cursor: default;
+    -webkit-tap-highlight-color: transparent;
+    transition: transform 0.15s, box-shadow 0.15s, opacity 0.25s;
+    border-left: 4px solid var(--brown-light);
+    position: relative;
+  }
+  .project-card:active { transform: scale(0.99); }
+  .project-card.priority-high { border-left-color: var(--priority-high); }
+  .project-card.priority-med { border-left-color: var(--priority-med); }
+  .project-card.priority-low { border-left-color: var(--priority-low); }
+  .project-card.priority-very-low { border-left-color: var(--priority-vlow); }
+
+  .card-inner {
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .card-top-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .card-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.4;
+    flex: 1;
+    min-width: 0;
+  }
+  .card-drag-handle {
+    color: #bbb;
+    font-size: 20px;
+    cursor: grab;
+    flex-shrink: 0;
+    padding: 2px;
+    line-height: 1;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: none;
+    user-select: none;
+  }
+  .card-drag-handle:active { cursor: grabbing; }
+
+  .card-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 10px;
+    border-radius: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .badge-row {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .badge-label-text {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-secondary);
+  }
+  .badge-priority-high { background: #ffebee; color: var(--priority-high); }
+  .badge-priority-med { background: #fff3e0; color: var(--priority-med); }
+  .badge-priority-low { background: #e8f5e9; color: var(--priority-low); }
+  .badge-priority-very-low { background: #f5f5f5; color: var(--priority-vlow); }
+  .badge-length-long { background: #e8eaf6; color: var(--len-long); }
+  .badge-length-med { background: #f3e5f5; color: var(--len-med); }
+  .badge-length-short { background: #e0f2f1; color: var(--len-short); }
+  .badge-length-fast { background: #e8f5e9; color: var(--len-fast); }
+
+  .card-meta-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .card-vendors {
+    font-size: 13px;
+    color: var(--text-secondary);
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .card-vendors .vendors-label {
+    font-weight: 500;
+    color: var(--text);
+  }
+  .card-cost {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--orange-accent);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .card-cost .cost-zero {
+    font-weight: 400;
+    color: var(--text-secondary);
+  }
+
+  .card-actions {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 4px;
+    border-top: 1px solid var(--gray-border);
+    margin-top: 4px;
+  }
+  .card-actions button {
+    border: none;
+    background: var(--gray-light);
+    font-size: 12px;
+    font-weight: 500;
+    padding: 4px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: background 0.15s;
+    line-height: 1.4;
+  }
+  .card-actions .btn-edit-card {
+    color: var(--brown-mid);
+  }
+  .card-actions .btn-edit-card:active { background: var(--gray-border); }
+
+  /* ─── Drag & Drop ─────────────────────── */
+  .dashboard.drag-active {
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .dashboard.drag-active .project-card {
+    transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1), opacity 0.2s ease;
+  }
+  .project-card.drag-origin {
+    opacity: 0.35;
+    transform: scale(0.97);
+  }
+
+  /* Ghost card that follows the pointer */
+  .drag-ghost {
+    position: fixed;
+    z-index: 200;
+    pointer-events: none;
+    width: calc(100% - 24px);
+    max-width: 576px;
+    left: 12px;
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.25), 0 0 0 2px var(--orange-accent);
+    border-left: 4px solid var(--orange-accent);
+    overflow: hidden;
+    transform: rotate(2deg) scale(1.02);
+    transition: transform 0.15s ease;
+  }
+  .drag-ghost .card-inner {
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .drag-ghost .card-top-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .drag-ghost .card-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.4;
+    flex: 1;
+  }
+  .drag-ghost .card-drag-handle {
+    color: var(--orange-accent);
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+  .drag-ghost .card-badges { display: flex; flex-wrap: wrap; gap: 6px; }
+  .drag-ghost .card-meta-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .drag-ghost .card-vendors {
+    font-size: 13px;
+    color: var(--text-secondary);
+    flex: 1;
+  }
+  .drag-ghost .card-cost {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--orange-accent);
+  }
+
+  /* Drop indicator — orange horizontal bar */
+  .drop-indicator {
+    height: 3px;
+    background: var(--orange-accent);
+    border-radius: 2px;
+    margin: -1px 0 9px;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+    pointer-events: none;
+  }
+  .drop-indicator.show {
+    opacity: 1;
+  }
+
+  /* Bottom Bar */
+  .bottom-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 60;
+    background: var(--white);
+    border-top: 1px solid var(--gray-border);
+    padding: 10px 16px calc(10px + var(--safe-bottom));
+    display: flex;
+    gap: 10px;
+    box-shadow: 0 -2px 8px rgba(0,0,0,0.08);
+  }
+  .bottom-bar .btn-add {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: var(--radius);
+    background: var(--orange-accent);
+    color: white;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: background 0.2s;
+  }
+  .bottom-bar .btn-add:active { background: var(--orange-light); }
+
+  /* Modal Overlay */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    background: rgba(0,0,0,0.4);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.25s, visibility 0.25s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .modal-overlay.open { opacity: 1; visibility: visible; }
+
+  /* Bottom Sheet Modal */
+  .modal-sheet {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 101;
+    background: var(--white);
+    border-radius: 20px 20px 0 0;
+    max-height: 92vh;
+    overflow-y: auto;
+    transform: translateY(100%);
+    transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: var(--safe-bottom);
+  }
+  .modal-sheet.open { transform: translateY(0); }
+
+  .modal-sheet .handle {
+    width: 40px;
+    height: 4px;
+    background: #ccc;
+    border-radius: 2px;
+    margin: 10px auto 4px;
+  }
+  .modal-sheet .modal-header {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: var(--white);
+    display: flex;
+    align-items: center;
+    padding: 8px 16px 12px;
+    border-bottom: 1px solid var(--gray-border);
+  }
+  .modal-sheet .modal-header .close-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: var(--brown-dark);
+    padding: 4px 8px 4px 0;
+    cursor: pointer;
+    line-height: 1;
+  }
+  .modal-sheet .modal-header h2 {
+    font-size: 17px;
+    font-weight: 600;
+    flex: 1;
+  }
+  .modal-sheet .modal-body { padding: 16px; }
+
+  /* Form Fields */
+  .form-group {
+    margin-bottom: 16px;
+  }
+  .form-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--gray-border);
+    border-radius: 10px;
+    font-size: 15px;
+    font-family: inherit;
+    color: var(--text);
+    background: var(--gray-light);
+    -webkit-appearance: none;
+    appearance: none;
+    outline: none;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    border-color: var(--orange-accent);
+    background: var(--white);
+  }
+  .form-group textarea { resize: vertical; min-height: 60px; }
+  .form-row {
+    display: flex;
+    gap: 12px;
+  }
+  .form-row .form-group { flex: 1; }
+
+  /* Modal Save Button */
+  .modal-save-btn {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: var(--radius);
+    background: var(--orange-accent);
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: background 0.2s;
+    margin-top: 8px;
+  }
+  .modal-save-btn:active { background: var(--orange-light); }
+
+  /* Delete confirmation in modal */
+  .delete-confirm-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
+  }
+  .delete-confirm-row .btn-cancel-del {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid var(--gray-border);
+    border-radius: 10px;
+    background: var(--white);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .delete-confirm-row .btn-confirm-del {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 10px;
+    background: var(--priority-high);
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .delete-confirm-row .btn-confirm-del:active { opacity: 0.8; }
+
+  /* Loading / Error */
+  .loading-msg {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-secondary);
+    font-size: 15px;
+  }
+  .error-msg {
+    text-align: center;
+    padding: 20px;
+    color: var(--priority-high);
+    font-size: 14px;
+    background: #ffebee;
+    border-radius: var(--radius);
+    margin: 12px;
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--brown-dark);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    z-index: 150;
+    opacity: 0;
+    transition: opacity 0.3s, transform 0.3s;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* ─── Completed Section ────────────────────── */
+  .completed-section-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 20px 4px 10px;
+    color: var(--text-secondary);
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-top: 1px solid var(--gray-border);
+    margin-top: 8px;
+  }
+  .completed-section-header .completed-count {
+    font-weight: 400;
+    color: var(--text-secondary);
+    opacity: 0.6;
+  }
+  .project-card.done {
+    opacity: 0.7;
+    border-left-color: var(--text-secondary) !important;
+  }
+  .project-card.done .card-title {
+    text-decoration: line-through;
+    color: var(--text-secondary);
+  }
+  .project-card.done .card-cost {
+    color: var(--text-secondary);
+  }
+  .project-card.done .card-drag-handle {
+    display: none;
+  }
+  .done-meta {
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+  .btn-done-card {
+    color: var(--priority-low) !important;
+  }
+  .btn-done-card:active { background: #e8f5e9; }
+  .btn-reopen-card {
+    color: var(--priority-med) !important;
+  }
+  .btn-reopen-card:active { background: #fff3e0; }
+
+  /* Search Bar */
+  .search-bar {
+    padding: 10px 12px;
+    background: #e8e0d5;
+    border-bottom: 1px solid var(--gray-border);
+    position: relative;
+  }
+  .search-bar input {
+    width: 100%;
+    padding: 10px 40px 10px 14px;
+    border: 1px solid var(--gray-border);
+    border-radius: 10px;
+    font-size: 15px;
+    font-family: inherit;
+    color: var(--text);
+    background: var(--white);
+    -webkit-appearance: none;
+    appearance: none;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-sizing: border-box;
+  }
+  .search-bar input:focus {
+    border-color: var(--orange-accent);
+    box-shadow: 0 0 0 2px rgba(230,81,0,0.15);
+  }
+  .search-bar input::placeholder {
+    color: var(--text-secondary);
+  }
+  .search-clear-btn {
+    position: absolute;
+    right: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 18px;
+    cursor: pointer;
+    padding: 4px 6px;
+    line-height: 1;
+    display: none;
+    z-index: 2;
+    border-radius: 4px;
+    transition: color 0.2s, background 0.2s;
+  }
+  .search-clear-btn:hover {
+    color: var(--text);
+    background: var(--gray-border);
+  }
+  .search-clear-btn.visible {
+    display: block;
+  }
+
+  /* No results */
+  .no-results {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-secondary);
+    font-size: 15px;
+  }
+
+  /* Version stamp */
+  .version-stamp {
+    text-align: right;
+    padding: 16px 4px 8px;
+    font-size: 11px;
+    color: var(--text-secondary);
+  }
+</style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="header">
+    <a href="/" class="home-link" aria-label="Home">🏠</a>
+    <h1>Home Improvement</h1>
+    <span class="header-count" id="projectCount">0</span>
+    <span class="header-save-status" id="saveStatus"></span>
+  </div>
+
+  <!-- Dashboard -->
+  <div class="search-bar">
+    <input type="text" id="searchInput" placeholder="🔍 Search projects..." autocomplete="off">
+    <button class="search-clear-btn" id="searchClearBtn" aria-label="Clear search">&times;</button>
+  </div>
+
+  <div class="dashboard" id="dashboard">
+    <div class="loading-msg" id="loadingMsg">Loading projects...</div>
+  </div>
+
+  <!-- Empty state (hidden by default) -->
+  <div class="empty-state" id="emptyState" style="display:none">
+    <div class="empty-icon">🔨</div>
+    <p><strong>No home improvement projects yet.</strong><br>Tap the button below to add your first project!</p>
+  </div>
+
+  <!-- Bottom Bar -->
+  <div class="bottom-bar">
+    <button class="btn-add" id="btnAdd">+ Add Project</button>
+  </div>
+
+  <!-- Modal Overlay -->
+  <div class="modal-overlay" id="modalOverlay"></div>
+
+  <!-- Bottom Sheet Modal -->
+  <div class="modal-sheet" id="modalSheet">
+    <div class="handle"></div>
+    <div class="modal-header">
+      <button class="close-btn" id="modalClose">✕</button>
+      <h2 id="modalTitle">Add Project</h2>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="editId" value="">
+      <div class="form-group">
+        <label for="inputTitle">Project Name</label>
+        <input type="text" id="inputTitle" placeholder="e.g. Roof Cleaning" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label for="inputVendors">Potential Vendors</label>
+        <input type="text" id="inputVendors" placeholder="e.g. ABC Roofing, CleanPro Services" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label for="inputCost">Estimated Total Cost</label>
+        <input type="number" id="inputCost" placeholder="0.00" min="0" step="0.01">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="inputPriority">Priority</label>
+          <select id="inputPriority">
+            <option value="High">High</option>
+            <option value="Med" selected>Med</option>
+            <option value="Low">Low</option>
+            <option value="Very Low">Very Low</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="inputLength">Work Length</label>
+          <select id="inputLength">
+            <option value="Long">Long</option>
+            <option value="Med" selected>Med</option>
+            <option value="Short">Short</option>
+            <option value="Fast">Fast</option>
+          </select>
+        </div>
+      </div>
+      <button class="modal-save-btn" id="modalSave">Save Project</button>
+      <div id="deleteArea" style="display:none">
+        <hr style="border:none;border-top:1px solid var(--gray-border);margin:16px 0">
+        <button class="btn-delete-card" id="showDeleteBtn" style="width:100%;padding:10px;border:1px solid #ffcdd2;border-radius:10px;background:none;color:var(--priority-high);font-size:14px;font-weight:500;cursor:pointer;transition:background 0.15s;">Delete Project</button>
+        <div class="delete-confirm-row" id="deleteConfirmRow" style="display:none">
+          <button class="btn-cancel-del" id="cancelDelete">Cancel</button>
+          <button class="btn-confirm-del" id="confirmDelete">Delete Project</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+<script>
+(function() {
+  'use strict';
+
+  // ─── State ──────────────────────────────────────────────
+  let projects = [];
+  let dragState = null;
+  let searchQuery = '';
+  // dragState = { id, card, ghost, startY, cardHeight, sorted, fromIdx, toIdx, dropY, isPointerDown }
+
+  // ─── DOM refs ────────────────────────────────────────────
+  const dashboard = document.getElementById('dashboard');
+  const loadingMsg = document.getElementById('loadingMsg');
+  const emptyState = document.getElementById('emptyState');
+  const projectCount = document.getElementById('projectCount');
+  const saveStatus = document.getElementById('saveStatus');
+  const btnAdd = document.getElementById('btnAdd');
+  const modalOverlay = document.getElementById('modalOverlay');
+  const modalSheet = document.getElementById('modalSheet');
+  const modalTitle = document.getElementById('modalTitle');
+  const modalClose = document.getElementById('modalClose');
+  const modalSave = document.getElementById('modalSave');
+  const editId = document.getElementById('editId');
+  const inputTitle = document.getElementById('inputTitle');
+  const inputVendors = document.getElementById('inputVendors');
+  const inputCost = document.getElementById('inputCost');
+  const inputPriority = document.getElementById('inputPriority');
+  const inputLength = document.getElementById('inputLength');
+  const deleteArea = document.getElementById('deleteArea');
+  const showDeleteBtn = document.getElementById('showDeleteBtn');
+  const deleteConfirmRow = document.getElementById('deleteConfirmRow');
+  const cancelDelete = document.getElementById('cancelDelete');
+  const confirmDelete = document.getElementById('confirmDelete');
+  const toastEl = document.getElementById('toast');
+  const searchInput = document.getElementById('searchInput');
+  const searchClearBtn = document.getElementById('searchClearBtn');
+  let toastTimer = null;
+
+  // ─── API ─────────────────────────────────────────────────
+  const API_BASE = '/HomeImprovement/api/homeimprovement';
+
+  async function loadData() {
+    const res = await fetch(API_BASE + '/data');
+    const json = await res.json();
+    if (!json.success) throw new Error(json.error || 'Failed to load');
+    projects = json.data.projects || [];
+    render();
+  }
+
+  async function saveData() {
+    saveStatus.textContent = 'saving…';
+    try {
+      const res = await fetch(API_BASE + '/data', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ projects })
+      });
+      const json = await res.json();
+      if (!json.success) throw new Error(json.error || 'Save failed');
+      saveStatus.textContent = 'saved ✓';
+      setTimeout(() => { if (saveStatus.textContent === 'saved ✓') saveStatus.textContent = ''; }, 2000);
+    } catch (err) {
+      saveStatus.textContent = '✗ error';
+      showToast('Save failed: ' + err.message);
+    }
+  }
+
+  // ─── Toast ───────────────────────────────────────────────
+  function showToast(msg, duration) {
+    duration = duration || 2500;
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toastEl.classList.remove('show'), duration);
+  }
+
+  // ─── Search ──────────────────────────────────────────────
+  function matchesSearch(project, query) {
+    if (!query) return true;
+    const q = query.toLowerCase();
+    return (
+      (project.title || '').toLowerCase().includes(q) ||
+      (project.vendors || '').toLowerCase().includes(q) ||
+      (project.priority || '').toLowerCase().includes(q) ||
+      (project.workLength || '').toLowerCase().includes(q)
+    );
+  }
+
+  // ─── Render ──────────────────────────────────────────────
+  function render() {
+    loadingMsg.style.display = 'none';
+
+    // Separate active and done projects, filter both by search
+    const activeProjects = projects.filter(p => !p.done && matchesSearch(p, searchQuery));
+    const doneProjects = projects.filter(p => p.done && matchesSearch(p, searchQuery));
+
+    projectCount.textContent = activeProjects.length + '/' + projects.length;
+
+    if (projects.length === 0) {
+      dashboard.innerHTML = '';
+      emptyState.style.display = 'block';
+      return;
+    }
+    emptyState.style.display = 'none';
+
+    if (activeProjects.length === 0 && doneProjects.length === 0) {
+      dashboard.innerHTML = '<div class="no-results">No projects match your search.</div><div class="version-stamp">07/23/26 @ 08:30 PM</div>';
+      return;
+    }
+
+    let html = '';
+
+    // Active section
+    if (activeProjects.length > 0) {
+      const sortedActive = [...activeProjects].sort((a, b) => (a.order || 0) - (b.order || 0));
+      for (const p of sortedActive) {
+        html += renderCard(p);
+      }
+    } else if (searchQuery) {
+      // Searching but no active matches — still show the active section heading if there are active projects not matching search
+      const anyActive = projects.filter(p => !p.done);
+      if (anyActive.length > 0 && doneProjects.length > 0) {
+        // Both sections exist but active filtered to zero
+      }
+    }
+
+    // Completed section
+    if (doneProjects.length > 0) {
+      const sortedDone = [...doneProjects].sort((a, b) => {
+        const da = a.doneDate || '';
+        const db = b.doneDate || '';
+        return db.localeCompare(da); // newest first
+      });
+      html += `<div class="completed-section-header">✅ Completed <span class="completed-count">(${doneProjects.length})</span></div>`;
+      for (const p of sortedDone) {
+        html += renderCard(p, true);
+      }
+    }
+
+    dashboard.innerHTML = html + '<div class="version-stamp">07/23/26 @ 08:30 PM</div>';
+
+    // Attach card action listeners
+    document.querySelectorAll('.btn-edit-card').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openEditModal(btn.dataset.id);
+      });
+    });
+
+    // Attach done button listeners
+    document.querySelectorAll('.btn-done-card').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        markDone(btn.dataset.id);
+      });
+    });
+
+    // Attach reopen button listeners
+    document.querySelectorAll('.btn-reopen-card').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        reopenProject(btn.dataset.id);
+      });
+    });
+
+    // Attach drag handles (only on non-done cards)
+    document.querySelectorAll('.project-card:not(.done) .card-drag-handle').forEach(handle => {
+      handle.addEventListener('mousedown', onDragPointerDown);
+      handle.addEventListener('touchstart', onDragPointerDown, { passive: false });
+    });
+  }
+
+  function renderCard(p, isDone) {
+    isDone = isDone || false;
+    const priorityClass = 'priority-' + p.priority.toLowerCase().replace(/\s+/g, '-');
+    const costDisplay = p.estimatedCost > 0
+      ? '$' + Number(p.estimatedCost).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })
+      : '<span class="cost-zero">—</span>';
+
+    const doneDateStr = p.doneDate ? formatDisplayDate(p.doneDate) : '';
+
+    return `
+      <div class="project-card ${priorityClass}${isDone ? ' done' : ''}" data-id="${p.id}">
+        <div class="card-inner">
+          <div class="card-top-row">
+            <span class="card-title">${escapeHtml(p.title)}</span>
+            ${isDone ? '' : '<span class="card-drag-handle">⠿</span>'}
+          </div>
+          <div class="card-badges">
+            <span class="badge-row"><span class="badge-label-text">Priority</span> <span class="badge badge-priority-${p.priority.toLowerCase().replace(/\s+/g, '-')}">${p.priority}</span></span>
+            <span class="badge-row"><span class="badge-label-text">Length</span> <span class="badge badge-length-${p.workLength.toLowerCase().replace(/\s+/g, '-')}">${p.workLength}</span></span>
+          </div>
+          <div class="card-meta-row">
+            <span class="card-vendors"><span class="vendors-label">Vendors:</span> ${escapeHtml(p.vendors || 'None listed')}</span>
+            <span class="card-cost">${costDisplay}</span>
+          </div>
+          ${isDone ? `<div class="done-meta">Completed ${doneDateStr}</div>` : ''}
+          <div class="card-actions">
+            ${isDone
+              ? `<button class="btn-reopen-card" data-id="${p.id}">↩ Reopen</button>`
+              : `<button class="btn-edit-card" data-id="${p.id}">✏️ Edit</button><button class="btn-done-card" data-id="${p.id}">✓ Done</button>`
+            }
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  // ─── Done / Reopen ──────────────────────────────────────────
+  function markDone(id) {
+    const p = projects.find(x => x.id === id);
+    if (!p) return;
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    p.done = true;
+    p.doneDate = yyyy + '-' + mm + '-' + dd;
+    showToast('✓ "' + p.title + '" marked as done');
+    render();
+    saveData();
+  }
+
+  function reopenProject(id) {
+    const p = projects.find(x => x.id === id);
+    if (!p) return;
+    p.done = false;
+    p.doneDate = undefined;
+    showToast('↩ "' + p.title + '" reopened');
+    render();
+    saveData();
+  }
+
+  function formatDisplayDate(dateStr) {
+    if (!dateStr) return '';
+    const parts = dateStr.split('-');
+    if (parts.length !== 3) return dateStr;
+    const d = new Date(parts[0] + '-' + parts[1] + '-' + parts[2] + 'T00:00:00');
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    return months[d.getMonth()] + ' ' + parseInt(parts[2]) + ', ' + parts[0];
+  }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  // ─── Drag & Drop (Touch + Mouse) ─────────────────────────
+  function onDragPointerDown(e) {
+    e.preventDefault();
+    const handle = e.currentTarget;
+    const card = handle.closest('.project-card');
+    if (!card) return;
+
+    const rect = card.getBoundingClientRect();
+    const id = card.dataset.id;
+    const sorted = [...projects].sort((a, b) => (a.order || 0) - (b.order || 0));
+    const fromIdx = sorted.findIndex(p => p.id === id);
+
+    // Cache initial card positions for stable hit-testing during drag (active cards only)
+    const cards = [...document.querySelectorAll('.project-card:not(.done)')];
+    const positions = cards.map(c => {
+      const r = c.getBoundingClientRect();
+      return { id: c.dataset.id, midY: r.top + r.height / 2, top: r.top };
+    });
+
+    // Calculate pointer offset within the card
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    const offsetY = clientY - rect.top;
+
+    // Create ghost clone
+    const ghost = card.cloneNode(true);
+    ghost.className = 'drag-ghost';
+    ghost.style.top = (clientY - offsetY) + 'px';
+    ghost.style.height = rect.height + 'px';
+    // Remove buttons from ghost
+    ghost.querySelectorAll('button').forEach(b => b.remove());
+    document.body.appendChild(ghost);
+
+    // Mark origin
+    card.classList.add('drag-origin');
+    dashboard.classList.add('drag-active');
+
+    // Create drop indicator
+    const indicator = document.createElement('div');
+    indicator.className = 'drop-indicator';
+    card.parentNode.insertBefore(indicator, card);
+
+    dragState = {
+      id, card, ghost, indicator,
+      positions,
+      offsetY,
+      cardHeight: rect.height,
+      sorted,
+      fromIdx,
+      toIdx: fromIdx,
+      initialScrollY: window.scrollY,
+      scrollRAF: null,
+      moved: false
+    };
+
+    // Attach move/end listeners
+    document.addEventListener('mousemove', onDragPointerMove);
+    document.addEventListener('mouseup', onDragPointerUp);
+    document.addEventListener('touchmove', onDragPointerMove, { passive: false });
+    document.addEventListener('touchend', onDragPointerUp);
+    document.addEventListener('touchcancel', onDragPointerUp);
+  }
+
+  function onDragPointerMove(e) {
+    if (!dragState) return;
+    e.preventDefault();
+
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    dragState.moved = true;
+
+    // Move ghost
+    dragState.ghost.style.top = (clientY - dragState.offsetY) + 'px';
+
+    // Auto-scroll near viewport edges (only on mobile/touch)
+    const edgeThreshold = 60;
+    const scrollDir = clientY < edgeThreshold ? -1 : (clientY > window.innerHeight - edgeThreshold ? 1 : 0);
+    if (scrollDir !== 0) {
+      if (!dragState.scrollRAF || dragState.scrollDir !== scrollDir) {
+        if (dragState.scrollRAF) cancelAnimationFrame(dragState.scrollRAF);
+        const dir = scrollDir;
+        function scrollTick() {
+          if (!dragState || dragState.scrollRAF === null) return;
+          window.scrollBy(0, dir * 8);
+          dragState.scrollRAF = requestAnimationFrame(scrollTick);
+        }
+        dragState.scrollRAF = requestAnimationFrame(scrollTick);
+        dragState.scrollDir = scrollDir;
+      }
+    } else if (dragState.scrollRAF) {
+      cancelAnimationFrame(dragState.scrollRAF);
+      dragState.scrollRAF = null;
+    }
+
+    // Find which slot the pointer is over — adjust cached midpoints by scroll delta
+    const positions = dragState.positions;
+    const scrollDelta = window.scrollY - dragState.initialScrollY;
+    let toIdx = dragState.fromIdx;
+    for (let i = 0; i < positions.length; i++) {
+      if (clientY > positions[i].midY) {
+        toIdx = i;
+      } else {
+        break;
+      }
+    }
+    toIdx = Math.max(0, Math.min(positions.length - 1, toIdx));
+
+    // Only update transforms when toIdx actually changes
+    if (toIdx !== dragState.toIdx) {
+      dragState.toIdx = toIdx;
+      applyCardShifts(toIdx);
+    }
+  }
+
+  function applyCardShifts(toIdx) {
+    const indicator = dragState.indicator;
+    const ch = dragState.cardHeight;
+    const gap = 10;
+    const fromIdx = dragState.fromIdx;
+    const cards = [...document.querySelectorAll('.project-card:not(.done)')];
+
+    if (toIdx === fromIdx) {
+      indicator.classList.remove('show');
+      cards.forEach(c => { c.style.transform = ''; });
+      return;
+    }
+
+    // Show indicator at insertion point
+    indicator.classList.add('show');
+    if (toIdx > fromIdx) {
+      cards[toIdx].parentNode.insertBefore(indicator, cards[toIdx].nextSibling);
+    } else {
+      cards[toIdx].parentNode.insertBefore(indicator, cards[toIdx]);
+    }
+
+    // Apply transform shifts — only cards between fromIdx and toIdx
+    cards.forEach((c, i) => {
+      if (i === fromIdx) {
+        c.style.transform = '';
+        return;
+      }
+      if (fromIdx < toIdx && i > fromIdx && i <= toIdx) {
+        c.style.transform = 'translateY(' + (-ch - gap) + 'px)';
+      } else if (fromIdx > toIdx && i >= toIdx && i < fromIdx) {
+        c.style.transform = 'translateY(' + (ch + gap) + 'px)';
+      } else {
+        c.style.transform = '';
+      }
+    });
+  }
+
+  function onDragPointerUp(e) {
+    if (!dragState) return;
+    e.preventDefault();
+
+    // Clean up listeners
+    document.removeEventListener('mousemove', onDragPointerMove);
+    document.removeEventListener('mouseup', onDragPointerUp);
+    document.removeEventListener('touchmove', onDragPointerMove);
+    document.removeEventListener('touchend', onDragPointerUp);
+    document.removeEventListener('touchcancel', onDragPointerUp);
+
+    // Stop auto-scroll
+    if (dragState.scrollRAF) {
+      cancelAnimationFrame(dragState.scrollRAF);
+      dragState.scrollRAF = null;
+    }
+
+    // Remove ghost
+    if (dragState.ghost && dragState.ghost.parentNode) {
+      dragState.ghost.parentNode.removeChild(dragState.ghost);
+    }
+    // Remove indicator
+    if (dragState.indicator && dragState.indicator.parentNode) {
+      dragState.indicator.parentNode.removeChild(dragState.indicator);
+    }
+
+    // Clean up dashboard
+    dashboard.classList.remove('drag-active');
+    document.querySelectorAll('.project-card:not(.done)').forEach(c => {
+      c.classList.remove('drag-origin');
+      c.style.transform = '';
+    });
+
+    // Commit reorder if actually moved
+    if (dragState.moved && dragState.toIdx !== dragState.fromIdx) {
+      commitReorder(dragState.sorted, dragState.fromIdx, dragState.toIdx);
+    }
+
+    dragState = null;
+  }
+
+  function commitReorder(sorted, fromIdx, toIdx) {
+    const [moved] = sorted.splice(fromIdx, 1);
+    sorted.splice(toIdx, 0, moved);
+    sorted.forEach((p, i) => { p.order = i; });
+    render();
+    saveData();
+  }
+
+  // ─── Modal ───────────────────────────────────────────────
+  let deleteTargetId = null;
+
+  function openAddModal() {
+    deleteTargetId = null;
+    modalTitle.textContent = 'Add Project';
+    editId.value = '';
+    inputTitle.value = '';
+    inputVendors.value = '';
+    inputCost.value = '';
+    inputPriority.value = 'Med';
+    inputLength.value = 'Med';
+    modalSave.textContent = 'Add Project';
+    openSheet();
+  }
+
+  function openEditModal(id) {
+    const p = projects.find(x => x.id === id);
+    if (!p) return;
+    deleteTargetId = id;
+    modalTitle.textContent = 'Edit Project';
+    editId.value = id;
+    inputTitle.value = p.title || '';
+    inputVendors.value = p.vendors || '';
+    inputCost.value = p.estimatedCost || '';
+    inputPriority.value = p.priority || 'Med';
+    inputLength.value = p.workLength || 'Med';
+    modalSave.textContent = 'Save Changes';
+    deleteArea.style.display = 'block';
+    deleteConfirmRow.style.display = 'none';
+    showDeleteBtn.style.display = 'block';
+    openSheet();
+  }
+
+  function openSheet() {
+    modalOverlay.classList.add('open');
+    modalSheet.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => inputTitle.focus(), 350);
+  }
+
+  function closeSheet() {
+    modalOverlay.classList.remove('open');
+    modalSheet.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function handleModalSave() {
+    const title = inputTitle.value.trim();
+    if (!title) {
+      inputTitle.focus();
+      showToast('Please enter a project name');
+      return;
+    }
+
+    const id = editId.value || 'project-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6);
+    const vendors = inputVendors.value.trim();
+    const cost = parseFloat(inputCost.value) || 0;
+    const priority = inputPriority.value;
+    const workLength = inputLength.value;
+
+    if (editId.value) {
+      const p = projects.find(x => x.id === id);
+      if (p) {
+        p.title = title;
+        p.vendors = vendors;
+        p.estimatedCost = cost;
+        p.priority = priority;
+        p.workLength = workLength;
+      }
+      showToast('Project updated');
+    } else {
+      const maxOrder = projects.reduce((m, p) => Math.max(m, p.order || 0), -1);
+      projects.push({
+        id, title, vendors,
+        estimatedCost: cost,
+        priority, workLength,
+        order: maxOrder + 1
+      });
+      showToast('Project added');
+    }
+
+    closeSheet();
+    render();
+    saveData();
+  }
+
+  // ─── Delete ──────────────────────────────────────────────
+  function deleteProject(id) {
+    const p = projects.find(x => x.id === id);
+    if (!p) return;
+    if (!confirm('Delete "' + p.title + '"? This cannot be undone.')) return;
+    projects = projects.filter(p => p.id !== id);
+    projects.sort((a, b) => (a.order || 0) - (b.order || 0)).forEach((p, i) => { p.order = i; });
+    render();
+    saveData();
+    showToast('Project deleted');
+  }
+
+  // ─── Search event listeners ────────────────────────────
+  searchInput.addEventListener('input', () => {
+    searchQuery = searchInput.value.trim();
+    searchClearBtn.classList.toggle('visible', searchInput.value.length > 0);
+    render();
+  });
+
+  searchClearBtn.addEventListener('click', () => {
+    searchInput.value = '';
+    searchQuery = '';
+    searchClearBtn.classList.remove('visible');
+    searchInput.focus();
+    render();
+  });
+
+  // ─── Init ────────────────────────────────────────────────
+  async function init() {
+    try {
+      await loadData();
+    } catch (err) {
+      loadingMsg.textContent = 'Error loading projects: ' + err.message;
+      loadingMsg.style.color = '#d32f2f';
+    }
+  }
+
+  // ─── Event Bindings ─────────────────────────────────────
+  btnAdd.addEventListener('click', openAddModal);
+  modalOverlay.addEventListener('click', closeSheet);
+  modalClose.addEventListener('click', closeSheet);
+  modalSave.addEventListener('click', handleModalSave);
+
+  document.querySelectorAll('#inputTitle, #inputVendors, #inputCost').forEach(field => {
+    field.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        handleModalSave();
+      }
+    });
+  });
+
+  // Delete flow in modal
+  showDeleteBtn.addEventListener('click', () => {
+    showDeleteBtn.style.display = 'none';
+    deleteConfirmRow.style.display = 'flex';
+  });
+  cancelDelete.addEventListener('click', () => {
+    deleteConfirmRow.style.display = 'none';
+    showDeleteBtn.style.display = 'block';
+  });
+  confirmDelete.addEventListener('click', () => {
+    if (deleteTargetId) {
+      closeSheet();
+      deleteProject(deleteTargetId);
+    }
+  });
+
+  init();
+})();
+</script>
+</body>
+</html>
