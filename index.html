@@ -54,6 +54,7 @@
   }
   html, body {
     height: 100%;
+    overflow-anchor: none;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     font-size: 16px;
     line-height: 1.5;
@@ -116,6 +117,9 @@
     padding: 12px 12px calc(100px + var(--safe-bottom));
     max-width: 600px;
     margin: 0 auto;
+    /* Scroll anchoring fights auto-scroll during drag: the browser yanks the
+       page back as the placeholder changes the layout above the viewport. */
+    overflow-anchor: none;
   }
 
   /* Empty state */
@@ -281,12 +285,17 @@
     user-select: none;
     -webkit-user-select: none;
   }
-  .dashboard.drag-active .project-card {
-    transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1), opacity 0.2s ease;
-  }
-  .project-card.drag-origin {
-    opacity: 0.35;
-    transform: scale(0.97);
+  /* The dragged card is hidden; the placeholder holds (and moves) its slot */
+  .project-card.drag-origin { display: none; }
+
+  .drop-placeholder {
+    height: 60px;
+    box-sizing: border-box;
+    border: 2px dashed var(--orange-accent);
+    border-radius: var(--radius);
+    background: rgba(214, 122, 45, 0.06);
+    margin-bottom: 10px;
+    pointer-events: none;
   }
 
   /* Ghost card that follows the pointer */
@@ -294,16 +303,14 @@
     position: fixed;
     z-index: 200;
     pointer-events: none;
-    width: calc(100% - 24px);
-    max-width: 576px;
-    left: 12px;
     background: var(--white);
     border-radius: var(--radius);
     box-shadow: 0 12px 40px rgba(0,0,0,0.25), 0 0 0 2px var(--orange-accent);
     border-left: 4px solid var(--orange-accent);
     overflow: hidden;
-    transform: rotate(2deg) scale(1.02);
-    transition: transform 0.15s ease;
+    will-change: top;
+    transform: rotate(1.5deg) scale(1.02);
+    opacity: 0.97;
   }
   .drag-ghost .card-inner {
     padding: 14px 16px;
@@ -345,20 +352,6 @@
     font-size: 15px;
     font-weight: 700;
     color: var(--orange-accent);
-  }
-
-  /* Drop indicator — orange horizontal bar */
-  .drop-indicator {
-    height: 3px;
-    background: var(--orange-accent);
-    border-radius: 2px;
-    margin: -1px 0 9px;
-    opacity: 0;
-    transition: opacity 0.15s ease;
-    pointer-events: none;
-  }
-  .drop-indicator.show {
-    opacity: 1;
   }
 
   /* Bottom Bar */
@@ -898,7 +891,7 @@
     emptyState.style.display = 'none';
 
     if (activeProjects.length === 0 && doneProjects.length === 0) {
-      dashboard.innerHTML = '<div class="no-results">No projects match your search.</div><div class="version-stamp">07/23/26 @ 08:30 PM</div>';
+      dashboard.innerHTML = '<div class="no-results">No projects match your search.</div><div class="version-stamp">11/01/26 @ 10:50 AM</div>';
       return;
     }
 
@@ -931,7 +924,7 @@
       }
     }
 
-    dashboard.innerHTML = html + '<div class="version-stamp">07/23/26 @ 08:30 PM</div>';
+    dashboard.innerHTML = html + '<div class="version-stamp">11/01/26 @ 10:50 AM</div>';
 
     // Attach card action listeners
     document.querySelectorAll('.btn-edit-card').forEach(btn => {
@@ -1042,201 +1035,256 @@
   }
 
   // ─── Drag & Drop (Touch + Mouse) ─────────────────────────
+  // Model: the dragged card is hidden and a dashed placeholder of identical
+  // size takes over its slot. The placeholder moves with the pointer and the
+  // remaining cards animate around it (FLIP). Hit-testing uses document-space
+  // midpoints captured at drag start, so it stays accurate while the page
+  // auto-scrolls.
+  const EDGE_ZONE = 90;        // px from the viewport edge where auto-scroll starts
+  const MAX_SCROLL_SPEED = 1300; // px per second at full tilt
+
+  function visibleActiveCards() {
+    return [...document.querySelectorAll('.project-card:not(.done)')];
+  }
+
   function onDragPointerDown(e) {
-    e.preventDefault();
-    const handle = e.currentTarget;
-    const card = handle.closest('.project-card');
+    if (dragState) return;
+    if (e.type === 'mousedown' && e.button !== 0) return;
+
+    const card = e.currentTarget.closest('.project-card');
     if (!card) return;
+    if (e.cancelable) e.preventDefault();
 
     const rect = card.getBoundingClientRect();
-    const id = card.dataset.id;
-    const sorted = [...projects].sort((a, b) => (a.order || 0) - (b.order || 0));
-    const fromIdx = sorted.findIndex(p => p.id === id);
+    const clientY = e.touches ? (e.touches[0] ? e.touches[0].clientY : 0) : e.clientY;
 
-    // Cache initial card positions for stable hit-testing during drag (active cards only)
-    const cards = [...document.querySelectorAll('.project-card:not(.done)')];
-    const positions = cards.map(c => {
-      const r = c.getBoundingClientRect();
-      return { id: c.dataset.id, midY: r.top + r.height / 2, top: r.top };
-    });
-
-    // Calculate pointer offset within the card
-    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-    const offsetY = clientY - rect.top;
-
-    // Create ghost clone
+    // Ghost clone follows the pointer
     const ghost = card.cloneNode(true);
     ghost.className = 'drag-ghost';
-    ghost.style.top = (clientY - offsetY) + 'px';
+    ghost.style.top = rect.top + 'px';
+    ghost.style.left = rect.left + 'px';
+    ghost.style.width = rect.width + 'px';
     ghost.style.height = rect.height + 'px';
-    // Remove buttons from ghost
-    ghost.querySelectorAll('button').forEach(b => b.remove());
+    ghost.querySelectorAll('button, .card-actions').forEach(el => el.remove());
     document.body.appendChild(ghost);
 
-    // Mark origin
-    card.classList.add('drag-origin');
+    // Placeholder takes over the origin's slot, then the origin collapses
+    const ph = document.createElement('div');
+    ph.className = 'drop-placeholder';
+    ph.style.height = rect.height + 'px';
+    card.parentNode.insertBefore(ph, card);
+    card.classList.add('drag-origin');   // display:none via CSS
+
     dashboard.classList.add('drag-active');
 
-    // Create drop indicator
-    const indicator = document.createElement('div');
-    indicator.className = 'drop-indicator';
-    card.parentNode.insertBefore(indicator, card);
-
     dragState = {
-      id, card, ghost, indicator,
-      positions,
-      offsetY,
-      cardHeight: rect.height,
-      sorted,
-      fromIdx,
-      toIdx: fromIdx,
-      initialScrollY: window.scrollY,
-      scrollRAF: null,
-      moved: false
+      card, ghost, ph,
+      offsetY: clientY - rect.top,
+      pointerY: clientY,
+      slots: [],
+      toIdx: -1,
+      moved: false,
+      lastTick: 0,
+      raf: null
     };
 
-    // Attach move/end listeners
+    measureSlots();
+    updateDropTarget();
+
     document.addEventListener('mousemove', onDragPointerMove);
     document.addEventListener('mouseup', onDragPointerUp);
     document.addEventListener('touchmove', onDragPointerMove, { passive: false });
     document.addEventListener('touchend', onDragPointerUp);
     document.addEventListener('touchcancel', onDragPointerUp);
+
+    dragState.raf = requestAnimationFrame(autoScrollTick);
   }
 
-  function onDragPointerMove(e) {
+  // Cache every droppable card's document-space midpoint once, at drag start.
+  // Document space (not viewport space) is what makes hit-testing survive
+  // auto-scrolling.
+  function measureSlots() {
+    dragState.slots = visibleActiveCards()
+      .filter(c => c !== dragState.card)
+      .map(c => {
+        const r = c.getBoundingClientRect();
+        const top = r.top + window.scrollY;
+        return { el: c, top: top, height: r.height, mid: top + r.height / 2 };
+      });
+  }
+
+  function computeDropIndex(docY) {
+    let idx = 0;
+    for (const s of dragState.slots) {
+      if (docY > s.mid) idx++;
+      else break;
+    }
+    return idx;
+  }
+
+  function updateDropTarget() {
     if (!dragState) return;
-    e.preventDefault();
 
-    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-    dragState.moved = true;
+    const idx = computeDropIndex(dragState.pointerY + window.scrollY);
+    if (idx === dragState.toIdx) return;
+    dragState.toIdx = idx;
 
-    // Move ghost
-    dragState.ghost.style.top = (clientY - dragState.offsetY) + 'px';
+    const slots = dragState.slots;
+    const ph = dragState.ph;
+    const ref = slots[idx] ? slots[idx].el : null;
+    const last = slots.length ? slots[slots.length - 1].el : null;
 
-    // Auto-scroll near viewport edges (only on mobile/touch)
-    const edgeThreshold = 60;
-    const scrollDir = clientY < edgeThreshold ? -1 : (clientY > window.innerHeight - edgeThreshold ? 1 : 0);
-    if (scrollDir !== 0) {
-      if (!dragState.scrollRAF || dragState.scrollDir !== scrollDir) {
-        if (dragState.scrollRAF) cancelAnimationFrame(dragState.scrollRAF);
-        const dir = scrollDir;
-        function scrollTick() {
-          if (!dragState || dragState.scrollRAF === null) return;
-          window.scrollBy(0, dir * 8);
-          dragState.scrollRAF = requestAnimationFrame(scrollTick);
-        }
-        dragState.scrollRAF = requestAnimationFrame(scrollTick);
-        dragState.scrollDir = scrollDir;
-      }
-    } else if (dragState.scrollRAF) {
-      cancelAnimationFrame(dragState.scrollRAF);
-      dragState.scrollRAF = null;
-    }
-
-    // Find which slot the pointer is over — adjust cached midpoints by scroll delta
-    const positions = dragState.positions;
-    const scrollDelta = window.scrollY - dragState.initialScrollY;
-    let toIdx = dragState.fromIdx;
-    for (let i = 0; i < positions.length; i++) {
-      if (clientY > positions[i].midY) {
-        toIdx = i;
-      } else {
-        break;
-      }
-    }
-    toIdx = Math.max(0, Math.min(positions.length - 1, toIdx));
-
-    // Only update transforms when toIdx actually changes
-    if (toIdx !== dragState.toIdx) {
-      dragState.toIdx = toIdx;
-      applyCardShifts(toIdx);
-    }
-  }
-
-  function applyCardShifts(toIdx) {
-    const indicator = dragState.indicator;
-    const ch = dragState.cardHeight;
-    const gap = 10;
-    const fromIdx = dragState.fromIdx;
-    const cards = [...document.querySelectorAll('.project-card:not(.done)')];
-
-    if (toIdx === fromIdx) {
-      indicator.classList.remove('show');
-      cards.forEach(c => { c.style.transform = ''; });
-      return;
-    }
-
-    // Show indicator at insertion point
-    indicator.classList.add('show');
-    if (toIdx > fromIdx) {
-      cards[toIdx].parentNode.insertBefore(indicator, cards[toIdx].nextSibling);
-    } else {
-      cards[toIdx].parentNode.insertBefore(indicator, cards[toIdx]);
-    }
-
-    // Apply transform shifts — only cards between fromIdx and toIdx
-    cards.forEach((c, i) => {
-      if (i === fromIdx) {
-        c.style.transform = '';
-        return;
-      }
-      if (fromIdx < toIdx && i > fromIdx && i <= toIdx) {
-        c.style.transform = 'translateY(' + (-ch - gap) + 'px)';
-      } else if (fromIdx > toIdx && i >= toIdx && i < fromIdx) {
-        c.style.transform = 'translateY(' + (ch + gap) + 'px)';
-      } else {
-        c.style.transform = '';
+    flipReflow(() => {
+      if (ref) {
+        ref.parentNode.insertBefore(ph, ref);
+      } else if (last) {
+        last.parentNode.insertBefore(ph, last.nextSibling);
       }
     });
   }
 
+  // FLIP: measure, mutate the DOM, then animate cards from old to new spots.
+  function flipReflow(mutate) {
+    const els = visibleActiveCards().filter(c => c !== dragState.card);
+
+    // Settle any in-flight animation so measurements reflect true layout
+    els.forEach(el => { el.style.transition = 'none'; el.style.transform = ''; });
+    void dashboard.offsetHeight;
+
+    const before = new Map();
+    els.forEach(el => before.set(el, el.getBoundingClientRect().top));
+
+    mutate();
+
+    const moved = [];
+    els.forEach(el => {
+      const dy = before.get(el) - el.getBoundingClientRect().top;
+      if (Math.abs(dy) < 1) return;
+      el.style.transition = 'none';
+      el.style.transform = 'translateY(' + dy + 'px)';
+      moved.push(el);
+    });
+    if (!moved.length) return;
+
+    void dashboard.offsetHeight;
+    moved.forEach(el => {
+      el.style.transition = 'transform 190ms cubic-bezier(0.2, 0, 0, 1)';
+      el.style.transform = '';
+    });
+  }
+
+  function onDragPointerMove(e) {
+    if (!dragState) return;
+    if (e.cancelable) e.preventDefault();
+
+    const clientY = e.touches
+      ? (e.touches[0] ? e.touches[0].clientY : dragState.pointerY)
+      : e.clientY;
+
+    dragState.pointerY = clientY;
+    dragState.moved = true;
+    dragState.ghost.style.top = (clientY - dragState.offsetY) + 'px';
+    updateDropTarget();
+  }
+
+  // Continuous auto-scroll: runs every frame so holding a finger at the edge
+  // keeps scrolling even when no pointer-move events are firing. Speed is
+  // derived from elapsed time, so it stays consistent whatever the frame rate.
+  function autoScrollTick(ts) {
+    if (!dragState) return;
+
+    const now = typeof ts === 'number' ? ts : performance.now();
+    const dt = dragState.lastTick ? Math.min(0.1, (now - dragState.lastTick) / 1000) : 0.016;
+    dragState.lastTick = now;
+
+    const y = dragState.pointerY;
+    const vh = window.innerHeight;
+    const zone = Math.min(EDGE_ZONE, vh / 3);
+    let factor = 0;
+
+    if (y < zone) {
+      factor = -Math.min(1, (zone - y) / zone);
+    } else if (y > vh - zone) {
+      factor = Math.min(1, (y - (vh - zone)) / zone);
+    }
+
+    if (factor !== 0) {
+      const beforeY = window.scrollY;
+      window.scrollBy(0, Math.round(factor * MAX_SCROLL_SPEED * dt));
+      if (window.scrollY !== beforeY) updateDropTarget();
+    }
+
+    dragState.raf = requestAnimationFrame(autoScrollTick);
+  }
+
   function onDragPointerUp(e) {
     if (!dragState) return;
-    e.preventDefault();
+    if (e && e.cancelable) e.preventDefault();
 
-    // Clean up listeners
     document.removeEventListener('mousemove', onDragPointerMove);
     document.removeEventListener('mouseup', onDragPointerUp);
     document.removeEventListener('touchmove', onDragPointerMove);
     document.removeEventListener('touchend', onDragPointerUp);
     document.removeEventListener('touchcancel', onDragPointerUp);
 
-    // Stop auto-scroll
-    if (dragState.scrollRAF) {
-      cancelAnimationFrame(dragState.scrollRAF);
-      dragState.scrollRAF = null;
-    }
+    if (dragState.raf) cancelAnimationFrame(dragState.raf);
 
-    // Remove ghost
-    if (dragState.ghost && dragState.ghost.parentNode) {
-      dragState.ghost.parentNode.removeChild(dragState.ghost);
-    }
-    // Remove indicator
-    if (dragState.indicator && dragState.indicator.parentNode) {
-      dragState.indicator.parentNode.removeChild(dragState.indicator);
-    }
+    // Resolve the final visual order by walking the list and swapping the
+    // placeholder for the card that was being dragged.
+    const movedId = dragState.card.dataset.id;
+    const seq = [];
+    dashboard.querySelectorAll('.project-card:not(.done):not(.drag-origin), .drop-placeholder').forEach(el => {
+      seq.push(el.classList.contains('drop-placeholder') ? movedId : el.dataset.id);
+    });
 
-    // Clean up dashboard
+    const ghost = dragState.ghost;
+    const ph = dragState.ph;
+    const card = dragState.card;
+    const moved = dragState.moved;
+
+    if (ghost.parentNode) ghost.parentNode.removeChild(ghost);
+    if (ph.parentNode) ph.parentNode.removeChild(ph);
+
+    card.classList.remove('drag-origin');
     dashboard.classList.remove('drag-active');
-    document.querySelectorAll('.project-card:not(.done)').forEach(c => {
-      c.classList.remove('drag-origin');
+    dashboard.querySelectorAll('.project-card').forEach(c => {
+      c.style.transition = '';
       c.style.transform = '';
     });
 
-    // Commit reorder if actually moved
-    if (dragState.moved && dragState.toIdx !== dragState.fromIdx) {
-      commitReorder(dragState.sorted, dragState.fromIdx, dragState.toIdx);
-    }
-
     dragState = null;
+
+    if (!moved) return;
+    if (applyVisibleOrder(seq)) {
+      render();
+      saveData();
+    }
   }
 
-  function commitReorder(sorted, fromIdx, toIdx) {
-    const [moved] = sorted.splice(fromIdx, 1);
-    sorted.splice(toIdx, 0, moved);
-    sorted.forEach((p, i) => { p.order = i; });
-    render();
-    saveData();
+  // Reorder only the cards that were on screen. Completed projects and any
+  // cards hidden by search keep their existing position in the master order.
+  function applyVisibleOrder(newActiveIds) {
+    if (!newActiveIds.length) return false;
+
+    const sorted = [...projects].sort((a, b) => (a.order || 0) - (b.order || 0));
+    const byId = new Map(projects.map(p => [p.id, p]));
+    const wanted = newActiveIds.map(id => byId.get(id)).filter(Boolean);
+    if (wanted.length !== newActiveIds.length) return false;
+
+    const visibleSet = new Set(newActiveIds);
+    let i = 0;
+    let changed = false;
+
+    const result = sorted.map(p => {
+      if (!visibleSet.has(p.id)) return p;
+      const next = wanted[i++];
+      if (next.id !== p.id) changed = true;
+      return next;
+    });
+
+    if (!changed) return false;
+    result.forEach((p, idx) => { p.order = idx; });
+    return true;
   }
 
   // ─── Modal ───────────────────────────────────────────────
