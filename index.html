@@ -259,6 +259,7 @@
   .card-actions {
     display: flex;
     justify-content: flex-end;
+    gap: 8px;
     padding-top: 4px;
     border-top: 1px solid var(--gray-border);
     margin-top: 4px;
@@ -747,7 +748,7 @@
         <input type="text" id="inputVendors" placeholder="e.g. ABC Roofing, CleanPro Services" autocomplete="off">
       </div>
       <div class="form-group">
-        <label for="inputCost">Estimated Total Cost</label>
+        <label for="inputCost" id="costLabel">Estimated Total Cost</label>
         <input type="number" id="inputCost" placeholder="0.00" min="0" step="0.01">
       </div>
       <div class="form-row">
@@ -811,6 +812,7 @@
   const inputTitle = document.getElementById('inputTitle');
   const inputVendors = document.getElementById('inputVendors');
   const inputCost = document.getElementById('inputCost');
+  const costLabel = document.getElementById('costLabel');
   const inputPriority = document.getElementById('inputPriority');
   const inputLength = document.getElementById('inputLength');
   const deleteArea = document.getElementById('deleteArea');
@@ -891,7 +893,7 @@
     emptyState.style.display = 'none';
 
     if (activeProjects.length === 0 && doneProjects.length === 0) {
-      dashboard.innerHTML = '<div class="no-results">No projects match your search.</div><div class="version-stamp">11/01/26 @ 10:50 AM</div>';
+      dashboard.innerHTML = '<div class="no-results">No projects match your search.</div><div class="version-stamp">11/01/26 @ 10:55 AM</div>';
       return;
     }
 
@@ -924,7 +926,7 @@
       }
     }
 
-    dashboard.innerHTML = html + '<div class="version-stamp">11/01/26 @ 10:50 AM</div>';
+    dashboard.innerHTML = html + '<div class="version-stamp">11/01/26 @ 10:55 AM</div>';
 
     // Attach card action listeners
     document.querySelectorAll('.btn-edit-card').forEach(btn => {
@@ -984,7 +986,7 @@
           ${isDone ? `<div class="done-meta">Completed ${doneDateStr}</div>` : ''}
           <div class="card-actions">
             ${isDone
-              ? `<button class="btn-reopen-card" data-id="${p.id}">↩ Reopen</button>`
+              ? `<button class="btn-edit-card" data-id="${p.id}">✏️ Edit</button><button class="btn-reopen-card" data-id="${p.id}">↩ Reopen</button>`
               : `<button class="btn-edit-card" data-id="${p.id}">✏️ Edit</button><button class="btn-done-card" data-id="${p.id}">✓ Done</button>`
             }
           </div>
@@ -1299,6 +1301,7 @@
     inputCost.value = '';
     inputPriority.value = 'Med';
     inputLength.value = 'Med';
+    costLabel.textContent = 'Estimated Total Cost';
     modalSave.textContent = 'Add Project';
     openSheet();
   }
@@ -1314,6 +1317,7 @@
     inputCost.value = p.estimatedCost || '';
     inputPriority.value = p.priority || 'Med';
     inputLength.value = p.workLength || 'Med';
+    costLabel.textContent = p.done ? 'Actual Total Cost' : 'Estimated Total Cost';
     modalSave.textContent = 'Save Changes';
     deleteArea.style.display = 'block';
     deleteConfirmRow.style.display = 'none';
