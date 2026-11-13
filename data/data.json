@@ -1,40 +1,34 @@
 {
   "projects": [
     {
-      "id": "roof-cleaning",
-      "title": "Roof Cleaning",
-      "vendors": "",
-      "estimatedCost": 0,
+      "id": "project-1792371381278-hr87",
+      "title": "Landscape Curbing",
+      "vendors": "AL Curbs",
+      "estimatedCost": 3100,
       "priority": "Med",
-      "workLength": "Short",
-      "order": 1
-    },
-    {
-      "id": "garage-floor",
-      "title": "Garage Floor Replacement",
-      "vendors": "",
-      "estimatedCost": 0,
-      "priority": "Very Low",
       "workLength": "Med",
-      "order": 12
-    },
-    {
-      "id": "kitchen-remodel",
-      "title": "Kitchen Remodel",
-      "vendors": "",
-      "estimatedCost": 0,
-      "priority": "Med",
-      "workLength": "Long",
-      "order": 3
+      "order": 6,
+      "attachments": [
+        {
+          "id": "dd3931226277b8cc",
+          "name": "2071 Rio Nuevo Curbing and Concrete Pad.pdf",
+          "stored": "dd3931226277b8cc.pdf",
+          "size": 3248219,
+          "type": "application/pdf",
+          "uploadedAt": "2026-11-08T20:02:47.682Z"
+        }
+      ]
     },
     {
       "id": "project-1782856025335-z19h",
       "title": "Driveway Sealing",
-      "vendors": "",
-      "estimatedCost": 0,
+      "vendors": "Mike Aducci +1 (815) 735-5054",
+      "estimatedCost": 480,
       "priority": "Med",
       "workLength": "Med",
-      "order": 2
+      "order": 1,
+      "done": true,
+      "doneDate": "2026-10-18"
     },
     {
       "id": "project-1782856429648-osoq",
@@ -43,17 +37,88 @@
       "estimatedCost": 0,
       "priority": "High",
       "workLength": "Short",
-      "order": 0,
+      "order": 2,
       "done": true,
       "doneDate": "2026-07-23"
     },
     {
-      "id": "project-1782856562814-w1va",
+      "id": "project-1782856692352-7rj6",
+      "title": "Land Rover Tires",
+      "vendors": "Costco",
+      "estimatedCost": 1300,
+      "priority": "Med",
+      "workLength": "Fast",
+      "order": 3,
+      "done": true,
+      "doneDate": "2026-08-20"
+    },
+    {
+      "id": "project-1784990770985-b51k",
+      "title": "Air conditioner Soft-Start",
+      "vendors": "MICRO-AIR EasyStart Flex 398 Soft Start Kit for Home & RV Air Conditioner",
+      "estimatedCost": 399,
+      "priority": "Med",
+      "workLength": "Med",
+      "order": 4,
+      "done": true,
+      "doneDate": "2026-11-01"
+    },
+    {
+      "id": "roof-cleaning",
+      "title": "Roof Cleaning",
+      "vendors": "William Pressure Washing (239) 980-0873",
+      "estimatedCost": 350,
+      "priority": "Med",
+      "workLength": "Short",
+      "order": 5,
+      "done": true,
+      "doneDate": "2026-10-08"
+    },
+    {
+      "id": "project-1793547769544-icdu",
       "title": "Patio for Grill",
+      "vendors": "AL Curbs",
+      "estimatedCost": 1000,
+      "priority": "Med",
+      "workLength": "Med",
+      "order": 7,
+      "attachments": [
+        {
+          "id": "30812b6f9c3d232d",
+          "name": "2071 Rio Nuevo Curbing and Concrete Pad.pdf",
+          "stored": "30812b6f9c3d232d.pdf",
+          "size": 3248219,
+          "type": "application/pdf",
+          "uploadedAt": "2026-11-08T20:03:00.346Z"
+        }
+      ]
+    },
+    {
+      "id": "project-1793548370222-ksar",
+      "title": "Downspout Extensions",
+      "vendors": "AL Curbs",
+      "estimatedCost": 450,
+      "priority": "Med",
+      "workLength": "Med",
+      "order": 8,
+      "attachments": [
+        {
+          "id": "5cf4d16d03b1344c",
+          "name": "2071 Rio Nuevo Curbing and Concrete Pad.pdf",
+          "stored": "5cf4d16d03b1344c.pdf",
+          "size": 3248219,
+          "type": "application/pdf",
+          "uploadedAt": "2026-11-08T20:03:05.606Z"
+        }
+      ]
+    },
+    {
+      "id": "kitchen-remodel",
+      "title": "Kitchen Remodel",
       "vendors": "",
       "estimatedCost": 0,
-      "priority": "Very Low",
-      "workLength": "Med",
+      "priority": "Med",
+      "workLength": "Long",
       "order": 11
     },
     {
@@ -63,34 +128,7 @@
       "estimatedCost": 0,
       "priority": "Med",
       "workLength": "Long",
-      "order": 6
-    },
-    {
-      "id": "project-1782856620297-4ic7",
-      "title": "Bathroom Remodel (Primary)",
-      "vendors": "",
-      "estimatedCost": 0,
-      "priority": "Med",
-      "workLength": "Long",
-      "order": 8
-    },
-    {
-      "id": "project-1782856692352-7rj6",
-      "title": "Land Rover Tires",
-      "vendors": "",
-      "estimatedCost": 0,
-      "priority": "Med",
-      "workLength": "Fast",
-      "order": 4
-    },
-    {
-      "id": "project-1782857438617-ajg7",
-      "title": "Paint Bedroom (Primary)",
-      "vendors": "",
-      "estimatedCost": 0,
-      "priority": "Low",
-      "workLength": "Long",
-      "order": 9
+      "order": 12
     },
     {
       "id": "project-1782857464175-0y2d",
@@ -99,16 +137,25 @@
       "estimatedCost": 0,
       "priority": "Low",
       "workLength": "Long",
-      "order": 7
+      "order": 13
     },
     {
-      "id": "project-1782950736215-n5ns",
-      "title": "Paint House Outside",
+      "id": "project-1782856620297-4ic7",
+      "title": "Bathroom Remodel (Primary)",
       "vendors": "",
       "estimatedCost": 0,
-      "priority": "Very Low",
+      "priority": "Med",
       "workLength": "Long",
-      "order": 13
+      "order": 14
+    },
+    {
+      "id": "project-1782857438617-ajg7",
+      "title": "Paint Bedroom (Primary)",
+      "vendors": "",
+      "estimatedCost": 0,
+      "priority": "Low",
+      "workLength": "Long",
+      "order": 15
     },
     {
       "id": "project-1783900443457-yzm7",
@@ -117,16 +164,89 @@
       "estimatedCost": 0,
       "priority": "Low",
       "workLength": "Med",
+      "order": 16
+    },
+    {
+      "id": "garage-floor",
+      "title": "Garage Floor & Florida Room Floor Replacement",
+      "vendors": "",
+      "estimatedCost": 0,
+      "priority": "Very Low",
+      "workLength": "Med",
       "order": 10
     },
     {
-      "id": "project-1784990770985-b51k",
-      "title": "Air conditioner Soft-Start",
-      "vendors": "Micro Air Easy Start Flex -saw on YouTube.",
+      "id": "project-1782950736215-n5ns",
+      "title": "Paint House Outside",
+      "vendors": "",
+      "estimatedCost": 0,
+      "priority": "Very Low",
+      "workLength": "Long",
+      "order": 17
+    },
+    {
+      "id": "project-1792569120065-vfl4",
+      "title": "Replace garage side door",
+      "vendors": "",
       "estimatedCost": 0,
       "priority": "Med",
       "workLength": "Med",
-      "order": 5
+      "order": 18
+    },
+    {
+      "id": "project-1793573677459-ngaa",
+      "title": "Replace Land Rover Battery",
+      "vendors": "",
+      "estimatedCost": 300,
+      "priority": "Med",
+      "workLength": "Med",
+      "order": 0
+    },
+    {
+      "id": "project-1793928981825-sbx6",
+      "title": "Repair Small Roof Leak in Den",
+      "vendors": "Chandler Roofing 239-282-5800",
+      "estimatedCost": 1850,
+      "priority": "Very Low",
+      "workLength": "Med",
+      "order": 19,
+      "attachments": [
+        {
+          "id": "c00f4e07ac23c50c",
+          "name": "2071 Rio Nuevo dr Tile  repairs.pdf",
+          "stored": "c00f4e07ac23c50c.pdf",
+          "size": 301241,
+          "type": "application/pdf",
+          "uploadedAt": "2026-11-08T20:01:32.968Z"
+        }
+      ]
+    },
+    {
+      "id": "project-1793929048816-883r",
+      "title": "Annual Property Tax Bill - Due in November",
+      "vendors": "2026=$4926.71",
+      "estimatedCost": 5000,
+      "priority": "Med",
+      "workLength": "Med",
+      "order": 20
+    },
+    {
+      "id": "project-1793929140199-rs6i",
+      "title": "Mini Split Air Conditioner for Florida Room",
+      "vendors": "",
+      "estimatedCost": 4000,
+      "priority": "Med",
+      "workLength": "Med",
+      "order": 9
+    },
+    {
+      "id": "project-1794174199798-z69l",
+      "title": "Monthly Weeding & Trimming Services (recommendation from Phil & Dave/Donna) $65 per month",
+      "vendors": "M Wayne (239) 848-5802; (239) 266-4869; waynerochine@gmail.com",
+      "estimatedCost": 0,
+      "priority": "Very Low",
+      "workLength": "Fast",
+      "order": 21
     }
   ]
 }
